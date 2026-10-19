@@ -6,6 +6,7 @@ import com.example.api.DTO.totalRequestDTO;
 import com.example.api.DTO.ultimoTotalDTO;
 import com.example.api.Models.*;
 import com.example.api.Repositories.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,5 +150,11 @@ public class totalService {
         return totalRepository.findUltimosRegistrosCompleto().stream()
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen registros completos"));
+    }
+
+    public List<RegistroCompletoResponseDTO> getRecordsPage(Integer cursor, Integer limit) {
+        int safeLimit = limit == null || limit <= 0 ? 25 : Math.min(limit, 100);
+        Integer effectiveCursor = (cursor == null || cursor <= 0) ? null : cursor;
+        return totalRepository.findRecordsPage(effectiveCursor, PageRequest.of(0, safeLimit));
     }
 }

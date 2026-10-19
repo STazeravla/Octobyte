@@ -2,8 +2,11 @@ package com.example.api.Services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -164,5 +167,25 @@ class totalServiceTest {
         assertEquals(220.0, result.getData().getVoltage());
         assertEquals("V", result.getMetadata().getUnits().get("voltage"));
         assertEquals("valid", result.getMetadata().getQuality().get("temperature"));
+    }
+
+    @Test
+    void shouldReturnRecordsPageWithCursorAndLimit() {
+        RegistroCompletoResponseDTO first = new RegistroCompletoResponseDTO();
+        first.setFecha(LocalDateTime.of(2025, 1, 15, 10, 30, 0));
+        first.setAlertLevel("normal");
+
+        RegistroCompletoResponseDTO second = new RegistroCompletoResponseDTO();
+        second.setFecha(LocalDateTime.of(2025, 1, 15, 11, 30, 0));
+        second.setAlertLevel("low");
+
+        when(totalRepository.findRecordsPage(eq(10), any(Pageable.class))).thenReturn(java.util.List.of(first, second));
+
+        java.util.List<RegistroCompletoResponseDTO> result = totalService.getRecordsPage(10, 2);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("normal", result.get(0).getAlertLevel());
+        assertEquals("low", result.get(1).getAlertLevel());
     }
 }

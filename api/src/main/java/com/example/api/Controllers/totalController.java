@@ -22,28 +22,20 @@ public class totalController {
         this.totalService = totalService;
     }
 
-    @GetMapping("/totales")
-    public List<totalModel> getAllTotales() {
-        return totalService.getAllTotales();
+    @GetMapping({"/totales", "/v1/records", "/records"})
+    public List<RegistroCompletoResponseDTO> getRecords(
+            @RequestParam(value = "cursor", required = false) Integer cursor,
+            @RequestParam(value = "limit", defaultValue = "25") Integer limit) {
+        return totalService.getRecordsPage(cursor, limit);
     }
 
-    @GetMapping("/totales/ultimo")
+    @GetMapping({"/totales/ultimo", "/v1/status", "/status", "/registro-completo/ultimo"})
     public ResponseEntity<RegistroCompletoResponseDTO> getUltimoTotal() {
         return ResponseEntity.ok(totalService.getUltimoRegistroCompleto());
     }
 
-    @PostMapping("/totales")
+    @PostMapping({"/totales", "/v1/records", "/records", "/registro-completo"})
     public ResponseEntity<RegistroCompletoResponseDTO> createTotal(@RequestBody RegistroCompletoRequestDTO request) {
         return ResponseEntity.ok(totalService.createCompleteRecord(request));
-    }
-
-    @PostMapping("/registro-completo")
-    public ResponseEntity<RegistroCompletoResponseDTO> createCompleteRecord(@RequestBody RegistroCompletoRequestDTO request) {
-        return ResponseEntity.ok(totalService.createCompleteRecord(request));
-    }
-
-    @GetMapping("/registro-completo/ultimo")
-    public ResponseEntity<RegistroCompletoResponseDTO> getUltimoRegistroCompleto() {
-        return ResponseEntity.ok(totalService.getUltimoRegistroCompleto());
     }
 }
